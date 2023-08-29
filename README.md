@@ -5,6 +5,11 @@ Given a exported project (.jar file) the scripts can a) make a dir in wich there
 Args: $1: exported project path, $2: quantity of files per dir
 Output: the dirctory "partitioned_executions" with isolated executions
 
+Execution one-liner preview:
+```bash
+sudo bash extract-executions-v1.sh ~/Desktop/test-project.jar 500
+```
+
 Basically what the script does is to copy the given project, to a temp file in /tmp, then from that copy, extract the executions and its corresponding files to a folder, the max quantity of files per directory is by users choice via argument in script run.
 
 The main intension is to break the executions in smaller chunks of data, so rundeck dont get too busy.
@@ -12,5 +17,9 @@ The main intension is to break the executions in smaller chunks of data, so rund
 # "Import Executions" script
 Args: $1: project name
 Output: Imported executions in the given project
+
+```bash
+sudo bash import-executions-v1.sh myProject
+```
 
 This script takes the content of "partitioned_executions" and import each dir (with executions) to rundeck
