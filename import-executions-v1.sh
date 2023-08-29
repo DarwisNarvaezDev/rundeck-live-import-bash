@@ -160,6 +160,8 @@ for subdir in "$execs_path"/*; do
 
         ((loop += 1))
 
+        rm -rf $subdir
+
         show_progress_bar $loop $total_dirs
         
     else
