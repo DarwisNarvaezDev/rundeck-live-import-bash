@@ -7,6 +7,9 @@ zip_path=$1
 dest_dir="/tmp/partitioned_executions"
 files_per_dir=$2
 
+# Exporting envs
+sh ./export_envs.sh
+
 # ZIP internal route
 extract_internal_executions_path(){
     

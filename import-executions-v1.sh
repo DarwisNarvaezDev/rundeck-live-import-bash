@@ -124,10 +124,25 @@ echo "Creating a copy of jobs from zip..."
 mkdir -p "$filename/$project_data_dir_preffix$prop_value"
 cp -r $job_path "$filename/$project_data_dir_preffix$prop_value"
 
+export RD_URL=http://127.0.0.1:4440
+export RD_USER=admin
+export RD_PASSWORD=admin
+export RD_TOKEN=sFAEsB51OGdr4nKeq9MV8m5vTcYaPw3m
+
+echo "Checking exported vars:"
+echo "RD_URL: ${RD_URL}"
+echo "RD_USER: ${RD_USER}"
+echo "RD_PASSWORD: ${RD_PASSWORD}"
+echo "RD_TOKEN: ${RD_TOKEN}"
+
 # Loop through the executions folder and, by iteration, copy the folder to the created folder and
 # change its name to "executions", then zip it and upload it as a rd project to server
 loop=0
-total_dirs=total_dirs=$(find "$execs_path" -maxdepth 1 -type d | wc -l)
+total_dirs=$(find "$execs_path" -maxdepth 1 -type d | wc -l)
+echo "Processing dirs qty: $total_dirs"
+
+sleep 4
+
 for subdir in "$execs_path"/*; do
     if [ -d "$subdir" ]; then
         echo "Dir found: $subdir"
@@ -158,11 +173,12 @@ for subdir in "$execs_path"/*; do
         #     exit 1
         # fi
 
-        ((loop += 1))
-
-        rm -rf $subdir
+        echo "Removing created zip: /tmp/rundeck-project-$loop.jar.001"
+        rm -rf "/tmp/rundeck-project-$loop.jar.001"
 
         show_progress_bar $loop $total_dirs
+
+        ((loop += 1))
         
     else
         echo "Directory $subdir not found"
