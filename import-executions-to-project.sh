@@ -15,30 +15,9 @@ dest_dir_exists=false
 dest_dir="/tmp/partitioned_executions"
 filecount=0
 dircount=0
-filename="project_execs"
+filename="/tmp/project_execs"
 temp_dir=""
 project_data_dir_preffix="rundeck-"
-
-# Check if the dir in which the partitioned execution will be stored exists,
-# if don't, skip all extraction process.
-echo "Checking the existence of dir: $dest_dir in /tmp..."
-if [ ! -d "$dest_dir" ]; then
-    dest_dir_exists=false
-    echo "Dir: $dest_dir not found, begining extraction process.."
-    echo "Creating $dest_dir dir..."
-    mkdir -p "$dest_dir"
-else
-    echo "Dir found: $dest_dir, skipping extraction process.."
-    dest_dir_exists=true
-fi
-
-# Report
-show_extraction_progress() {
-    echo -ne "Files being moved: $filecount from $files_per_dir | Folders created $dircount | Total of files to be copied: $temp_dir_size \r"
-}
-
-# Scape plan
-trap "rm -rf \"tmp.*\" \"$dest_dir\"; echo -e \"\nInterruption detected. Temp files and dirs removed.\"; exit 1" INT
 
 ####################### EXECUTIONS EXTRACTION PROCESS #################################
 do_execution_extraction(){
@@ -130,20 +109,32 @@ do_executions_import(){
         fi
     }
     
-    # Progress bar
+    # Import progress function
+    print_progress() {
+        local width=50
+        local percent="$1"
+        local fill="$(($width * $percent / 100))"
+        local empty="$(($width - $fill))"
+        local bar="["
+        local i
+        
+        for ((i = 0; i < fill; i++)); do
+            bar+="="
+        done
+        
+        for ((i = 0; i < empty; i++)); do
+            bar+=" "
+        done
+        
+        bar+="] $percent%"
+        echo -ne "\r$bar"
+    }
+    
     show_progress_bar() {
-        local current_iteration=$1
-        local total_iterations=$2
-        local bar_width=50
-        
-        percentage=$((current_iteration * 100 / total_iterations))
-        completed=$((percentage * bar_width / 100))
-        remaining=$((bar_width - completed))
-        
-        # Mover el cursor a la siguiente línea y actualizar el progreso
-        tput cuu1  # Mover el cursor hacia arriba una línea
-        tput el    # Limpiar la línea actual
-        printf "[%-${bar_width}s] %d%%\n" "$(printf '#%.0s' $(seq 1 $completed))" "$percentage"
+        local current="$1"
+        local total="$2"
+        local percent=$((current * 100 / total))
+        print_progress $percent
     }
     
     # Extract META-INF path
@@ -264,11 +255,35 @@ do_executions_import(){
     
     cd "/tmp"
     show_progress_bar $total_dirs $total_dirs
-    echo "All executions uploaded!"
+    printf "\n\033[32mAll executions imported successfully\033[32m\n"
 }
 ####################### EXECUTIONS IMPORT PROCESS #####################################
 
-do_execution_extraction
+# Check if the dir in which the partitioned execution will be stored exists,
+# if don't, skip all extraction process.
+echo "Checking the existence of dir: $dest_dir in /tmp..."
+if [ ! -d "$dest_dir" ]; then
+    dest_dir_exists=false
+    echo "Dir: $dest_dir not found, begining extraction process.."
+    echo "Creating $dest_dir dir..."
+    mkdir -p "$dest_dir"
+else
+    echo "Dir found: $dest_dir, skipping extraction process.."
+    dest_dir_exists=true
+fi
+
+# Report
+show_extraction_progress() {
+    echo -ne "Files being moved: $filecount from $files_per_dir | Folders created $dircount | Total of files to be copied: $temp_dir_size \r"
+}
+
+# Scape plan
+trap "rm -rf tmp.* \"tmp.*\" \"$dest_dir\"; echo -e \"\nInterruption detected. Temp files and dirs removed.\"; exit 1" INT
+
+if [ "$dest_dir_exists" = false ]; then
+    do_execution_extraction
+fi
+
 do_executions_import
 
 # Cleaning files from /tmp
