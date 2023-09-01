@@ -1,25 +1,18 @@
-# Bash Scripts for Rundeck
-Given a exported project (.jar file) the scripts can a) make a dir in wich there will be different directories with parts of executions and b) import each folder with executions, asynchronously to rd server via CLI.
+# Shell Script to Import Big Quantities of executions in Rundeck Project
+Given a exported project (.jar file) the script can take all the executions and import it to a fresh rundeck project asynchronously and with visible progres throug shell console.
 
-# "Extract Executions" script
-Args: $1: exported project path, $2: quantity of files per dir
-Output: the dirctory "partitioned_executions" with isolated executions
-
-Execution one-liner preview:
+# Script Usage
+One-liner preview:
 ```bash
-sudo bash extract-executions-v1.sh ~/Desktop/test-project.jar 500
+sudo bash import-executions-to-project.sh /home/user/path/exported-job.jar 1000 my-fresh-project http://127.0.0.1:4440 admin admin my-long-rundeck-auth-token /home/user/path/to/rundeckcli/jar/rdcli.jar
 ```
 
-Basically what the script does is to copy the given project, to a temp file in /tmp, then from that copy, extract the executions and its corresponding files to a folder, the max quantity of files per directory is by users choice via argument in script run.
-
-The main intension is to break the executions in smaller chunks of data, so rundeck dont get too busy.
-
-# "Import Executions" script
-Args: $1: project name
-Output: Imported executions in the given project
-
-```bash
-sudo bash import-executions-v1.sh myProject
-```
-
-This script takes the content of "partitioned_executions" and import each dir (with executions) to rundeck
+**Args explanation:**
+$1: The job inside your rundeck server in which the executions and jobs will be imported.
+$2: Since there are many executions, the script divides them into small portions of data before sending them to the server, this argument specifies the divisor number of the total files to upload, for example, if there are 1000 files and the number is 100, they will be sent executions in groups of 100.
+$3: The fresh project in which the executions and jobs will be imported.
+$4: The rundeck server URL
+$5: Qualified role username
+$6: Qualified role password
+$7: Auth token
+$8: Rundeck CLI executable jar path
