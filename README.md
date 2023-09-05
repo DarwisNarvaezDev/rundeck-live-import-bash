@@ -1,4 +1,4 @@
-# Shell Script to Import Big Quantities of executions in Rundeck Project
+# Shell Script to Import Big Quantities of Executions in Rundeck Project
 Given a exported project (.jar file) the script can take all the executions and import it to a fresh rundeck project asynchronously and with visible progres throug shell console.
 
 # Script Usage
