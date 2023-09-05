@@ -16,3 +16,8 @@ sudo bash import-executions-to-project.sh /home/user/path/exported-job.jar 1000 
 - $6: Qualified role password
 - $7: Auth token
 - $8: Rundeck CLI executable jar path
+
+## 🕑 Technical debt
+- Script for windows environments
+- Detailed error handling
+- Import pipeline for other components (webhooks, calendars, etc.)
